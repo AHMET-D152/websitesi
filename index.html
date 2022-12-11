@@ -1,0 +1,60 @@
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="index.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hackclub/css@79ee8661dfe9ab17af7d35cd8d9d7373029a8919/theme.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    </head>
+    <body>
+        <div id="container">
+            <img style="border-radius:50%" src="https://github.com/hackclub/dinosaurs/raw/master/smart_dinosaur_docs.png"/>
+            <h1 class="title" style="color: var(--primary)">Merhaba, ben Orpheus!</h1>
+            <h3 class="headline" style="color: var(--green)">
+                <i class="fa-brands fa-spotify"></i> 
+                <a id="kebab" style="color: var(--green)">?u anda bir ?ey dinlemiyorum!</a> 
+            </h3>
+            <h4 style="color: var(--blue)">
+               <a href="https://www.instagram.com/ahmet_34_bedel_/"target="_blank"><i class="fa-brands fa-instagram icons"></i></a>
+               <a href="https://discord.gg/JCgUUnmQfG"target="_blank"> <i class="fa-brands fa-discord icons"></i></a>
+               <a href="https://github.com/AHMET-D152"target="_blank"> <i class="fa-brands fa-github icons"></i></a>
+                
+            </h4>
+        </div>
+    </body>
+    <script>
+        fetch("https://api.lanyard.rest/v1/users/752534587279802378").then(e => e.json()).then(e => {
+            if(e.data["listening_to_spotify"]){
+                kebab = document.getElementById("kebab");
+                kebab.textContent = `${e.data.spotify.song} - ${e.data.spotify.artist}`
+            }
+        })
+        webSocket = new WebSocket("wss://api.lanyard.rest/socket")
+        webSocket.addEventListener("message", (event) => {
+            data = JSON.parse(event.data)
+            console.log(data)
+            if(event.data == "{\"op\":1,\"d\":{\"heartbeat_interval\":30000}}"){
+                webSocket.send(JSON.stringify({
+                    op: 2,
+                    d: {
+                    subscribe_to_id: "752534587279802378"
+                }
+                }))
+                setInterval(function(){
+                    webSocket.send("1")
+                }, 30000)
+            }
+            if(data.d.discord_user){
+            if(data.d.listening_to_spotify){
+                kebab = document.getElementById("kebab");
+                kebab.textContent = `${data.d.spotify.song} - ${data.d.spotify.artist}`
+            }else{
+                kebab = document.getElementById("kebab");
+                kebab.textContent = `şu anda bir şey dinlemiyorum!` 
+            }
+            }
+        })
+        // wss://api.lanyard.rest/socket
+    </script>
+</html>
+<!-- https://api.lanyard.rest/v1/users/752534587279802378 -->
